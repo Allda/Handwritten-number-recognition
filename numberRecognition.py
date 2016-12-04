@@ -1,4 +1,11 @@
 import argparse
+import numpy as np
+
+from skimage.feature import hog
+from sklearn.svm import LinearSVC
+from sklearn.externals import joblib
+
+from mnist import MNIST
 
 
 def setup_parser():
@@ -19,13 +26,35 @@ def setup_parser():
     return parser
 
 
+def train_classifier(images, labels):
+    image_hog_list = []
+    for image in images:
+        image_hog = hog(image.reshape((28, 28)), orientations=9,
+                        pixels_per_cell=(14, 14), cells_per_block=(1, 1),
+                        visualise=False)
+        image_hog_list.append(image_hog)
+    hog_features = np.array(image_hog_list, 'float64')
+
+    lcsv = LinearSVC()
+    lcsv.fit(hog_features, labels)
+
+    return lcsv
+
+
 def main():
     parser = setup_parser()
     args = parser.parse_args()
-    print args
+
+    mnist = MNIST()
+    img, labels = mnist.load_training()
+    img = np.array(img)
+
+    for i in range(50):
+        print MNIST.display(img[i]), labels[i]
     if args.train_classifier:
         print 'train'
-        # TODO: call training function and dump result to file
+        lcsv = train_classifier(img, labels)
+        joblib.dump(lcsv, 'classifier.pkl', compress=3)
     elif args.classify_mnist:
         print 'clasify mnist'
         # TODO: call classification function for MNIST data
