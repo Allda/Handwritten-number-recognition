@@ -41,6 +41,17 @@ def train_classifier(images, labels):
     return lcsv
 
 
+def classify_MNIST_data(images, labels, lcvs):
+    result = []
+    for index, image in enumerate(images):
+        image_hog = hog(image.reshape((28, 28)), orientations=9,
+                        pixels_per_cell=(14, 14), cells_per_block=(1, 1),
+                        visualise=False)
+        predicted_value = lcvs.predict(np.array([image_hog]))[0]
+        result.append((labels[index], predicted_value))
+    return result
+
+
 def main():
     parser = setup_parser()
     args = parser.parse_args()
@@ -57,6 +68,16 @@ def main():
         joblib.dump(lcsv, 'classifier.pkl', compress=3)
     elif args.classify_mnist:
         print 'clasify mnist'
+        lcvs = joblib.load("classifier.pkl")
+        testing_imgs, testing_labels = mnist.load_testing()
+        testing_imgs = np.array(testing_imgs)
+        result = classify_MNIST_data(testing_imgs, testing_labels, lcvs)
+        correct = 0
+        for item in result:
+            if item[0] == item[1]:
+                correct += 1
+        print "%s %s %s" % (correct, len(result),
+                            float(correct)/len(result) * 100)
         # TODO: call classification function for MNIST data
     elif args.classify_own:
         print 'classify own picture'
