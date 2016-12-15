@@ -35,10 +35,10 @@ def train_classifier(images, labels):
         image_hog_list.append(image_hog)
     hog_features = np.array(image_hog_list, 'float64')
 
-    lcsv = LinearSVC()
-    lcsv.fit(hog_features, labels)
+    lcvs = LinearSVC()
+    lcvs.fit(hog_features, labels)
 
-    return lcsv
+    return lcvs
 
 
 def classify_MNIST_data(images, labels, lcvs):
@@ -64,8 +64,8 @@ def main():
         print MNIST.display(img[i]), labels[i]
     if args.train_classifier:
         print 'train'
-        lcsv = train_classifier(img, labels)
-        joblib.dump(lcsv, 'classifier.pkl', compress=3)
+        lcvs = train_classifier(img, labels)
+        joblib.dump(lcvs, 'classifier.pkl', compress=3)
     elif args.classify_mnist:
         print 'clasify mnist'
         lcvs = joblib.load("classifier.pkl")
