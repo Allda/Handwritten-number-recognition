@@ -1,3 +1,4 @@
+import sys
 import argparse
 import numpy as np
 
@@ -72,7 +73,11 @@ def main():
         print "Classifer was save to file: %s" % classifier_file_name
     elif args.classify_mnist:
         print 'clasify mnist'
-        lcvs = joblib.load(classifier_file_name)
+        try:
+            lcvs = joblib.load(classifier_file_name)
+        except IOError:
+            print "No classifier file has been found: %s" % classifier_file_name
+            sys.exit(-1)
         testing_imgs, testing_labels = mnist.load_testing()
         testing_imgs = np.array(testing_imgs)
         result = classify_MNIST_data(testing_imgs, testing_labels, lcvs)
