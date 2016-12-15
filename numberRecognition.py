@@ -57,14 +57,12 @@ def main():
     args = parser.parse_args()
 
     mnist = MNIST()
-    img, labels = mnist.load_training()
-    img = np.array(img)
 
-    for i in range(50):
-        print MNIST.display(img[i]), labels[i]
     if args.train_classifier:
         print 'train'
-        lcvs = train_classifier(img, labels)
+        training_imgs, training_labels = mnist.load_training()
+        training_imgs = np.array(training_imgs)
+        lcvs = train_classifier(training_imgs, training_labels)
         joblib.dump(lcvs, 'classifier.pkl', compress=3)
     elif args.classify_mnist:
         print 'clasify mnist'
