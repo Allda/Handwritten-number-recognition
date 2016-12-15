@@ -7,6 +7,7 @@ from sklearn.externals import joblib
 
 from mnist import MNIST
 
+classifier_file_name = 'classifier.pkl'
 
 def setup_parser():
     parser = argparse.ArgumentParser(description='Hand writen number '
@@ -22,7 +23,8 @@ def setup_parser():
     parser.add_argument('--mnist', default=None, nargs='?',
                         help='Location of MNIST database. In case it is '
                              'missing, it will try to download database')
-
+    parser.add_argument('--classifier-file', default=None,
+                        help='Location of classifier file')
     return parser
 
 
@@ -55,6 +57,9 @@ def classify_MNIST_data(images, labels, lcvs):
 def main():
     parser = setup_parser()
     args = parser.parse_args()
+    if args.classifier_file:
+        global classifier_file_name
+        classifier_file_name = args.classifier_file
 
     mnist = MNIST()
 
@@ -63,10 +68,11 @@ def main():
         training_imgs, training_labels = mnist.load_training()
         training_imgs = np.array(training_imgs)
         lcvs = train_classifier(training_imgs, training_labels)
-        joblib.dump(lcvs, 'classifier.pkl', compress=3)
+        joblib.dump(lcvs, classifier_file_name, compress=3)
+        print "Classifer was save to file: %s" % classifier_file_name
     elif args.classify_mnist:
         print 'clasify mnist'
-        lcvs = joblib.load("classifier.pkl")
+        lcvs = joblib.load(classifier_file_name)
         testing_imgs, testing_labels = mnist.load_testing()
         testing_imgs = np.array(testing_imgs)
         result = classify_MNIST_data(testing_imgs, testing_labels, lcvs)
