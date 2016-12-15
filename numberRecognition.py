@@ -1,4 +1,5 @@
 import sys
+import json
 import argparse
 import numpy as np
 
@@ -54,6 +55,30 @@ def classify_MNIST_data(images, labels, lcvs):
         result.append((labels[index], predicted_value))
     return result
 
+def print_statistics(result):
+    numbers = []
+    for index in range(0, 10):
+        numbers.append({})
+        numbers[index] = {
+                'number': index,
+                'total': 0,
+                'correct': 0,
+                'incorrect': {},
+                'success_rate': 0
+                }
+        for incorrect_index in range(0, 10):
+            numbers[index]['incorrect'][incorrect_index] = 0
+    for item in result:
+        numbers[item[0]]['total'] += 1
+        if item[0] == item[1]:
+            numbers[item[0]]['correct'] += 1
+        else:
+            numbers[item[0]]['incorrect'][item[1]] += 1
+
+    for number in numbers:
+        number['success_rate'] = float(number['correct']) / number['total'] * 100
+    print json.dumps(numbers, indent=4)
+
 
 def main():
     parser = setup_parser()
@@ -87,7 +112,7 @@ def main():
                 correct += 1
         print "%s %s %s" % (correct, len(result),
                             float(correct)/len(result) * 100)
-        # TODO: call classification function for MNIST data
+        print_statistics(result)
     elif args.classify_own:
         print 'classify own picture'
         print args.classify_own
