@@ -8,6 +8,7 @@ from sklearn.svm import LinearSVC
 from sklearn.externals import joblib
 
 from mnist import MNIST
+from ownNumberProcessor import OwnNumberProcessor
 
 classifier_file_name = 'classifier.pkl'
 
@@ -116,6 +117,14 @@ def main():
     elif args.classify_own:
         print 'classify own picture'
         print args.classify_own
+        try:
+            lcvs = joblib.load(classifier_file_name)
+        except IOError:
+            print "No classifier file has been found: %s" % classifier_file_name
+            sys.exit(-1)
+        processor = OwnNumberProcessor()
+        processor.set_img(args.classify_own)
+        processor.process(lcvs)
         # TODO: call classification function for own image
 
 if __name__ == '__main__':
