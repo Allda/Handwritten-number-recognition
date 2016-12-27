@@ -5,6 +5,8 @@ import numpy as np
 
 from skimage.feature import hog
 from sklearn.svm import LinearSVC
+from sklearn import neighbors
+
 from sklearn.externals import joblib
 
 from mnist import MNIST
@@ -16,8 +18,10 @@ def setup_parser():
     parser = argparse.ArgumentParser(description='Hand writen number '
                                                  ' recognition')
     main_group = parser.add_mutually_exclusive_group()
-    main_group.add_argument('--train-classifier', action='store_true',
-                            help='Train classifier')
+    main_group.add_argument('--train-linear-classifier', action='store_true',
+                            help='Train linear classifier')
+    main_group.add_argument('--train-k-nearest-classifier', action='store_true',
+                            help='Train k-nearest classifier')
     main_group.add_argument('--classify-mnist', action='store_true',
                             help='Classify MNIST database')
     main_group.add_argument('--classify-own', default=None, metavar='FILE',
@@ -31,7 +35,7 @@ def setup_parser():
     return parser
 
 
-def train_classifier(images, labels):
+def train_linear_classifier(images, labels):
     image_hog_list = []
     for image in images:
         image_hog = hog(image.reshape((28, 28)), orientations=9,
@@ -45,14 +49,28 @@ def train_classifier(images, labels):
 
     return lcvs
 
+def train_kNearest_classifier(images, labels):
+    image_hog_list = []
+    for image in images:
+        image_hog = hog(image.reshape((28, 28)), orientations=9,
+                        pixels_per_cell=(14, 14), cells_per_block=(1, 1),
+                        visualise=False)
+        image_hog_list.append(image_hog)
+    hog_features = np.array(image_hog_list, 'float64')
 
-def classify_MNIST_data(images, labels, lcvs):
+    knn = neighbors.KNeighborsClassifier()
+    knn.fit(hog_features, labels)
+
+    return knn
+
+
+def classify_MNIST_data(images, labels, classifier):
     result = []
     for index, image in enumerate(images):
         image_hog = hog(image.reshape((28, 28)), orientations=9,
                         pixels_per_cell=(14, 14), cells_per_block=(1, 1),
                         visualise=False)
-        predicted_value = lcvs.predict(np.array([image_hog]))[0]
+        predicted_value = classifier.predict(np.array([image_hog]))[0]
         result.append((labels[index], predicted_value))
     return result
 
@@ -90,23 +108,30 @@ def main():
 
     mnist = MNIST()
 
-    if args.train_classifier:
-        print 'train'
+    if args.train_linear_classifier:
+        print 'train linear'
         training_imgs, training_labels = mnist.load_training()
         training_imgs = np.array(training_imgs)
-        lcvs = train_classifier(training_imgs, training_labels)
+        lcvs = train_linear_classifier(training_imgs, training_labels)
+        joblib.dump(lcvs, classifier_file_name, compress=3)
+        print "Classifer was save to file: %s" % classifier_file_name
+    elif args.train_k_nearest_classifier:
+        print 'train k-nearest'
+        training_imgs, training_labels = mnist.load_training()
+        training_imgs = np.array(training_imgs)
+        lcvs = train_kNearest_classifier(training_imgs, training_labels)
         joblib.dump(lcvs, classifier_file_name, compress=3)
         print "Classifer was save to file: %s" % classifier_file_name
     elif args.classify_mnist:
         print 'clasify mnist'
         try:
-            lcvs = joblib.load(classifier_file_name)
+            classifier = joblib.load(classifier_file_name)
         except IOError:
             print "No classifier file has been found: %s" % classifier_file_name
             sys.exit(-1)
         testing_imgs, testing_labels = mnist.load_testing()
         testing_imgs = np.array(testing_imgs)
-        result = classify_MNIST_data(testing_imgs, testing_labels, lcvs)
+        result = classify_MNIST_data(testing_imgs, testing_labels, classifier)
         correct = 0
         for item in result:
             if item[0] == item[1]:
