@@ -6,6 +6,9 @@ import numpy as np
 from skimage.feature import hog
 from sklearn.svm import LinearSVC
 from sklearn import neighbors
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import cluster
 
 from sklearn.externals import joblib
 
@@ -14,14 +17,17 @@ from ownNumberProcessor import OwnNumberProcessor
 
 classifier_file_name = 'classifier.pkl'
 
+LINEAR = "linear"
+K_MEANS = "k-means"
+K_NEAREST = "k-nearest"
+ADABOOST = "adaboost"
+
 def setup_parser():
     parser = argparse.ArgumentParser(description='Hand writen number '
                                                  ' recognition')
     main_group = parser.add_mutually_exclusive_group()
-    main_group.add_argument('--train-linear-classifier', action='store_true',
-                            help='Train linear classifier')
-    main_group.add_argument('--train-k-nearest-classifier', action='store_true',
-                            help='Train k-nearest classifier')
+    main_group.add_argument('--train-classifier', default=None, metavar='CLASSIFIER',
+                            help='Train classifier- possible classifiers linear, k-nearest, k-means, adaboost')
     main_group.add_argument('--classify-mnist', action='store_true',
                             help='Classify MNIST database')
     main_group.add_argument('--classify-own', default=None, metavar='FILE',
@@ -35,7 +41,7 @@ def setup_parser():
     return parser
 
 
-def train_linear_classifier(images, labels):
+def train_classifier(images, labels, classifier):
     image_hog_list = []
     for image in images:
         image_hog = hog(image.reshape((28, 28)), orientations=9,
@@ -44,24 +50,9 @@ def train_linear_classifier(images, labels):
         image_hog_list.append(image_hog)
     hog_features = np.array(image_hog_list, 'float64')
 
-    lcvs = LinearSVC()
-    lcvs.fit(hog_features, labels)
+    classifier.fit(hog_features, labels)
 
-    return lcvs
-
-def train_kNearest_classifier(images, labels):
-    image_hog_list = []
-    for image in images:
-        image_hog = hog(image.reshape((28, 28)), orientations=9,
-                        pixels_per_cell=(14, 14), cells_per_block=(1, 1),
-                        visualise=False)
-        image_hog_list.append(image_hog)
-    hog_features = np.array(image_hog_list, 'float64')
-
-    knn = neighbors.KNeighborsClassifier()
-    knn.fit(hog_features, labels)
-
-    return knn
+    return classifier
 
 
 def classify_MNIST_data(images, labels, classifier):
@@ -108,19 +99,26 @@ def main():
 
     mnist = MNIST()
 
-    if args.train_linear_classifier:
-        print 'train linear'
+    if args.train_classifier:
+        if args.train_classifier == LINEAR:
+            classifier = LinearSVC()
+        elif args.train_classifier == K_NEAREST:
+            classifier = neighbors.KNeighborsClassifier()
+        elif args.train_classifier == ADABOOST:
+            classifier = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),
+                           algorithm="SAMME",
+                           n_estimators=200)
+        elif args.train_classifier == K_MEANS:
+            classifier = cluster.KMeans(n_clusters=10) # We have ten numbers
+        else:
+            print "No correct classifier set: %s" % args.train_classifier
+            sys.exit(-1)
+
+        print 'train %s' % args.train_classifier
         training_imgs, training_labels = mnist.load_training()
         training_imgs = np.array(training_imgs)
-        lcvs = train_linear_classifier(training_imgs, training_labels)
-        joblib.dump(lcvs, classifier_file_name, compress=3)
-        print "Classifer was save to file: %s" % classifier_file_name
-    elif args.train_k_nearest_classifier:
-        print 'train k-nearest'
-        training_imgs, training_labels = mnist.load_training()
-        training_imgs = np.array(training_imgs)
-        lcvs = train_kNearest_classifier(training_imgs, training_labels)
-        joblib.dump(lcvs, classifier_file_name, compress=3)
+        classifier = train_classifier(training_imgs, training_labels, classifier)
+        joblib.dump(classifier, classifier_file_name, compress=3)
         print "Classifer was save to file: %s" % classifier_file_name
     elif args.classify_mnist:
         print 'clasify mnist'
