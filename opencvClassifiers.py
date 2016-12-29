@@ -21,7 +21,11 @@ class openCVClassifier(object):
 
     def create_classifier(self, name):
         if name == LINEAR:
-            pass
+            self.classifier = cv2.ml.SVM_create()
+            self.classifier.setType(cv2.ml.SVM_C_SVC)
+            self.classifier.setGamma(5.383)
+            self.classifier.setC(2.67)
+            self.classifier.setKernel(cv2.ml.SVM_LINEAR)
         elif name == K_NEAREST:
             self.classifier = cv2.ml.KNearest_create()
         elif name == ADABOOST:
@@ -41,7 +45,10 @@ class openCVClassifier(object):
 
         hog_features = np.array(image_hog_list, 'float32')
 
-        self.classifier.train(hog_features, cv2.ml.ROW_SAMPLE, training_labels)
+        if self.type == LINEAR:
+            self.classifier.train(hog_features, cv2.ml.ROW_SAMPLE, np.array(training_labels, dtype=np.int32))
+        else:
+            self.classifier.train(hog_features, cv2.ml.ROW_SAMPLE, training_labels)
 
     def test_classifier(self, testing_imgs, testing_labels):
         image_hog_list_test = []
@@ -54,6 +61,9 @@ class openCVClassifier(object):
         result = []
         if self.type == K_NEAREST:
             ret, result, neighbours, dist = self.classifier.findNearest(hog_features_test, k=5)
+        elif self.type == LINEAR:
+            result = self.classifier.predict(hog_features_test)
+            result = result[1]
 
         correct = 0
         i = 0
