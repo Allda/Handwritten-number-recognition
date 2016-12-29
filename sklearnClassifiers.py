@@ -21,13 +21,13 @@ from constants import RANDOM_FOREST
 class sklearnClassifier(object):
 
     classifier_file_name = 'classifier-sklearn.pkl'
+    pixels_per_cell = (6, 6)
+    cells_per_block = (4, 4)
 
     def __init__(self):
         self.hog = None
         self.classifier = None
         self.type = ""
-
-    # def create_hog(self, win_size = (28, 28), block_size = (14, 14), block_stride = (14, 14), cell_size = (14, 14), nbins = 9):
 
     def create_classifier(self, name):
         if name == LINEAR:
@@ -59,8 +59,8 @@ class sklearnClassifier(object):
         start = time.time()
         for image in images:
             image_hog = hog(image.reshape((28, 28)), orientations=9,
-                            pixels_per_cell=(14, 14), cells_per_block=(1, 1),
-                            visualise=False)
+                            pixels_per_cell=self.pixels_per_cell, cells_per_block=self.cells_per_block,
+                            visualise=True)
             image_hog_list.append(image_hog)
         hog_features = np.array(image_hog_list, 'float64')
 
@@ -74,7 +74,7 @@ class sklearnClassifier(object):
         start = time.time()
         for index, image in enumerate(images):
             image_hog = hog(image.reshape((28, 28)), orientations=9,
-                            pixels_per_cell=(14, 14), cells_per_block=(1, 1),
+                            pixels_per_cell=self.pixels_per_cell, cells_per_block=self.cells_per_block,
                             visualise=False)
 
             predicted_value = self.classifier.predict(np.array([image_hog]))[0]
