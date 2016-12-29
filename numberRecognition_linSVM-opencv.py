@@ -12,12 +12,6 @@ cell_size = (14, 14)
 
 hog_desc = cv2.HOGDescriptor(win_size, block_size, block_stride, cell_size, nbins)
 
-svm_params = dict( kernel_type = cv2.ml.SVM_LINEAR,
-                    svm_type = cv2.ml.SVM_C_SVC,
-                    C=2.67, gamma=5.383 )
-
-affine_flags = cv2.WARP_INVERSE_MAP|cv2.INTER_LINEAR
-
 def train_classifier(images, labels):
     image_hog_list = []
     
@@ -75,7 +69,7 @@ def main():
     svm.save(classifier_file_name)
 
     accuracy = test_classifier(testing_imgs, testing_labels, svm)
-    print accuracy	
+    print accuracy  
 
 if __name__ == '__main__':
     main()
