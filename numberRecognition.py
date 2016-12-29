@@ -5,10 +5,10 @@ import numpy as np
 
 from skimage.feature import hog
 from sklearn.svm import LinearSVC
-from sklearn import neighbors
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn import cluster
+from sklearn.cluster import KMeans
 
 from sklearn.externals import joblib
 
@@ -103,13 +103,13 @@ def main():
         if args.train_classifier == LINEAR:
             classifier = LinearSVC()
         elif args.train_classifier == K_NEAREST:
-            classifier = neighbors.KNeighborsClassifier()
+            classifier = KNeighborsClassifier()
         elif args.train_classifier == ADABOOST:
-            classifier = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),
+            classifier = AdaBoostClassifier(DecisionTreeClassifier(),
                            algorithm="SAMME",
                            n_estimators=200)
         elif args.train_classifier == K_MEANS:
-            classifier = cluster.KMeans(n_clusters=10) # We have ten numbers
+            classifier = KMeans(n_clusters=10) # We have ten numbers
         else:
             print "No correct classifier set: %s" % args.train_classifier
             sys.exit(-1)
@@ -148,7 +148,6 @@ def main():
         processor = OwnNumberProcessor()
         processor.set_img(args.classify_own)
         processor.process(lcvs)
-        # TODO: call classification function for own image
 
 if __name__ == '__main__':
     main()

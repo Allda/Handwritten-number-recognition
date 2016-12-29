@@ -29,7 +29,7 @@ class OwnNumberProcessor(object):
         for rect in rects:
             cv2.rectangle(self.img, (rect[0], rect[1]), (rect[0] + rect[2], rect[1] + rect[3]), (0, 255, 0), 3)
 
-            leng = int(rect[3] * 2)
+            leng = int(rect[3] * 1.6)
             pt1 = int(rect[1] + rect[3] / 2 - leng / 2)
             pt2 = int(rect[0] + rect[2] / 2 - leng / 2)
 
