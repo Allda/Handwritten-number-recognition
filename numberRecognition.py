@@ -9,14 +9,8 @@ from sklearn.externals import joblib
 from mnist import MNIST
 from opencvClassifiers import openCVClassifier
 from ownNumberProcessor import OwnNumberProcessor
-from sklearnClassifiers import sklearnClassifier
+from sklearnClassifiers import sklearnClassifier, classifiers
 
-LINEAR = "linear"
-K_MEANS = "k-means"
-K_NEAREST = "k-nearest"
-ADABOOST = "adaboost"
-
-classifiers = [LINEAR, K_MEANS, K_NEAREST, ADABOOST]
 def setup_parser():
     parser = argparse.ArgumentParser(description='Hand writen number '
                                                  ' recognition')
@@ -31,7 +25,6 @@ def setup_parser():
                             choices=classifiers,
                             help='Train classifier. Choices: %s' %
                                  ', '.join(classifiers))
-
     main_group.add_argument('--classify-mnist', action='store_true',
                             help='Classify MNIST database')
     main_group.add_argument('--classify-own', default=None, metavar='FILE',
@@ -80,7 +73,7 @@ def main():
         testing_imgs = np.array(testing_imgs)
         testing_labels = np.array(testing_labels)
         classifier.test_classifier(testing_imgs, testing_labels)
-        # classifier.save_classifier()
+        classifier.save_classifier()
 
     elif args.classify_mnist:
         print 'clasify mnist'
