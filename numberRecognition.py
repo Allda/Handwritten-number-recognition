@@ -22,12 +22,16 @@ K_MEANS = "k-means"
 K_NEAREST = "k-nearest"
 ADABOOST = "adaboost"
 
+classifiers = [LINEAR, K_MEANS, K_NEAREST, ADABOOST]
 def setup_parser():
     parser = argparse.ArgumentParser(description='Hand writen number '
                                                  ' recognition')
     main_group = parser.add_mutually_exclusive_group()
-    main_group.add_argument('--train-classifier', default=None, metavar='CLASSIFIER',
-                            help='Train classifier- possible classifiers linear, k-nearest, k-means, adaboost')
+    main_group.add_argument('--train-classifier', default=None,
+                            metavar='CLASSIFIER',
+                            choices=classifiers,
+                            help='Train classifier. Choices: %s' %
+                                 ', '.join(classifiers))
     main_group.add_argument('--classify-mnist', action='store_true',
                             help='Classify MNIST database')
     main_group.add_argument('--classify-own', default=None, metavar='FILE',
