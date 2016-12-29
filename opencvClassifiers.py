@@ -2,10 +2,10 @@ import numpy as np
 
 import cv2
 
-LINEAR = "linear"
-K_MEANS = "k-means"
-K_NEAREST = "k-nearest"
-ADABOOST = "adaboost"
+from constants import LINEAR
+from constants import K_NEAREST
+from constants import ADABOOST
+from constants import K_MEANS
 
 class openCVClassifier(object):
 

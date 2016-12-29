@@ -10,12 +10,11 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.cluster import KMeans
 from sklearn.externals import joblib
 
-LINEAR = "linear"
-K_MEANS = "k-means"
-K_NEAREST = "k-nearest"
-ADABOOST = "adaboost"
+from constants import LINEAR
+from constants import K_NEAREST
+from constants import ADABOOST
+from constants import K_MEANS
 
-classifiers = [LINEAR, K_MEANS, K_NEAREST, ADABOOST]
 
 class sklearnClassifier(object):
 

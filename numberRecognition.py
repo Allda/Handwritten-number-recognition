@@ -9,7 +9,9 @@ from sklearn.externals import joblib
 from mnist import MNIST
 from opencvClassifiers import openCVClassifier
 from ownNumberProcessor import OwnNumberProcessor
-from sklearnClassifiers import sklearnClassifier, classifiers
+from sklearnClassifiers import sklearnClassifier
+
+from constants import classifiers
 
 def setup_parser():
     parser = argparse.ArgumentParser(description='Hand writen number '
