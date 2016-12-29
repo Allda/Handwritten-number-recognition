@@ -1,5 +1,5 @@
 import numpy as np
-
+import time
 import json
 
 from skimage.feature import hog
@@ -9,11 +9,13 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.cluster import KMeans
 from sklearn.externals import joblib
+from sklearn.ensemble import RandomForestClassifier
 
 from constants import LINEAR
 from constants import K_NEAREST
 from constants import ADABOOST
 from constants import K_MEANS
+from constants import RANDOM_FOREST
 
 
 class sklearnClassifier(object):
@@ -36,6 +38,8 @@ class sklearnClassifier(object):
             self.classifier = AdaBoostClassifier(DecisionTreeClassifier(),
                            algorithm="SAMME",
                            n_estimators=200)
+        elif name == RANDOM_FOREST:
+            self.classifier = RandomForestClassifier(n_estimators = 100)
         elif name == K_MEANS:
             self.classifier = KMeans(n_clusters=10) # We have ten numbers
         else:
@@ -50,7 +54,9 @@ class sklearnClassifier(object):
             print "No classifier file has been found: %s" % self.classifier_file_name
 
     def train_classifier(self, images, labels):
+
         image_hog_list = []
+        start = time.time()
         for image in images:
             image_hog = hog(image.reshape((28, 28)), orientations=9,
                             pixels_per_cell=(14, 14), cells_per_block=(1, 1),
@@ -60,14 +66,22 @@ class sklearnClassifier(object):
 
         self.classifier.fit(hog_features, labels)
 
+        end = time.time()
+        print("time to train: " + str(end - start))
+
     def test_classifier(self, images, labels):
         result = []
+        start = time.time()
         for index, image in enumerate(images):
             image_hog = hog(image.reshape((28, 28)), orientations=9,
                             pixels_per_cell=(14, 14), cells_per_block=(1, 1),
                             visualise=False)
+
             predicted_value = self.classifier.predict(np.array([image_hog]))[0]
             result.append((labels[index], predicted_value))
+
+        end = time.time()
+        print("time to test: " + str(end - start))
 
         correct = 0
         for item in result:

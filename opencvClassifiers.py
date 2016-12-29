@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 import cv2
 
@@ -39,6 +40,7 @@ class openCVClassifier(object):
 
     def train_classifier(self, training_imgs, training_labels):
         image_hog_list = []
+        start = time.time()
         for image in training_imgs:
             image_hog = self.get_hog_for_img(image.reshape((28, 28)))
             image_hog_list.append(image_hog)
@@ -50,8 +52,12 @@ class openCVClassifier(object):
         else:
             self.classifier.train(hog_features, cv2.ml.ROW_SAMPLE, training_labels)
 
+        end = time.time()
+        print("time to train: " + str(end - start))
+
     def test_classifier(self, testing_imgs, testing_labels):
         image_hog_list_test = []
+        start = time.time()
         for image in testing_imgs:
             image_hog = self.get_hog_for_img(image.reshape((28, 28)))
             image_hog_list_test.append(image_hog)
@@ -64,6 +70,9 @@ class openCVClassifier(object):
         elif self.type == LINEAR:
             result = self.classifier.predict(hog_features_test)
             result = result[1]
+
+        end = time.time()
+        print("time to train: " + str(end - start))
 
         correct = 0
         i = 0

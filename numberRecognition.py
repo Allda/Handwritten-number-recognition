@@ -89,14 +89,11 @@ def main():
     elif args.classify_own:
         print 'classify own picture'
         print args.classify_own
-        try:
-            lcvs = joblib.load(classifier_file_name)
-        except IOError:
-            print "No classifier file has been found: %s" % classifier_file_name
-            sys.exit(-1)
+        classifier = sklearnClassifier()
+        classifier.load_classifier()
         processor = OwnNumberProcessor()
         processor.set_img(args.classify_own)
-        processor.process(lcvs)
+        processor.process(classifier.classifier)
 
 if __name__ == '__main__':
     main()
