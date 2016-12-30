@@ -51,7 +51,7 @@ class openCVClassifier(object):
         elif name == K_NEAREST:
             self.classifier = cv2.ml.KNearest_create()
         elif name == ADABOOST:
-            print "AdaBoost is not implemented in OpenCV for more than one class."
+            print "AdaBoost is not implemented in OpenCV for more than two classes."
             sys.exit(1)
             pass
         elif name == RANDOM_FOREST:
