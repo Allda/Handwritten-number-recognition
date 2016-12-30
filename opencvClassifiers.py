@@ -88,7 +88,7 @@ class openCVClassifier(object):
             result = result[1]
 
         end = time.time()
-        print("time to train: " + str(end - start))
+        print("time to test: " + str(end - start))
 
         correct = 0
         i = 0
