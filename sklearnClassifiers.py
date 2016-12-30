@@ -64,6 +64,8 @@ class sklearnClassifier(object):
             image_hog_list.append(image_hog)
         hog_features = np.array(image_hog_list, 'float64')
 
+        print "HOG feature vector lenght: " + str(len(image_hog_list[0]))
+
         self.classifier.fit(hog_features, labels)
 
         end = time.time()

@@ -17,7 +17,7 @@ class openCVClassifier(object):
         self.classifier = None
         self.type = ""
 
-    def create_hog(self, win_size = (28, 28), block_size = (14, 14), block_stride = (14, 14), cell_size = (14, 14), nbins = 9):
+    def create_hog(self, win_size = (28, 28), block_size = (14, 14), block_stride = (14, 14), cell_size = (7, 7), nbins = 9):
         self.hog = cv2.HOGDescriptor(win_size, block_size, block_stride, cell_size, nbins)
 
     def create_classifier(self, name):
@@ -45,6 +45,7 @@ class openCVClassifier(object):
             image_hog = self.get_hog_for_img(image.reshape((28, 28)))
             image_hog_list.append(image_hog)
 
+        print "HOG feature vector lenght: " + str(len(image_hog_list[0]))
         hog_features = np.array(image_hog_list, 'float32')
 
         if self.type == LINEAR:
