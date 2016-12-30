@@ -22,8 +22,6 @@ class openCVClassifier(object):
     def init_hog(self, win_size=(28, 28), block_size=(14, 14), cell_size=(14, 14), nbins=9):
         block_stride = cell_size
         self.hog = cv2.HOGDescriptor(win_size, block_size, block_stride, cell_size, nbins)
-        print cell_size
-        print (block_size[0]/cell_size[0], block_size[1]/cell_size[1])
 
     def create_classifier(self, name):
         if name == LINEAR:
@@ -112,8 +110,6 @@ class openCVClassifier(object):
         else:
             result = self.classifier.predict([image_hog])
             result = result[1]
-
-        print result
 
         return result
 

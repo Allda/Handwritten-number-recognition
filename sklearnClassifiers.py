@@ -34,8 +34,6 @@ class sklearnClassifier(object):
         self.win_size = win_size
         self.pixels_per_cell = cell_size
         self.cells_per_block = (block_size[0]/cell_size[0], block_size[1]/cell_size[1])
-        print self.pixels_per_cell
-        print self.cells_per_block
         self.nbins = nbins
 
     def create_classifier(self, name):
@@ -100,10 +98,7 @@ class sklearnClassifier(object):
             if item[0] == item[1]:
                 correct += 1
 
-        # print "%s %s %s" % (correct, len(result),
-        #                     float(correct)/len(result) * 100)
         print float(correct)/len(result) * 100
-        # self.print_statistics(result)
 
     def print_statistics(self, result):
         numbers = []
@@ -132,8 +127,6 @@ class sklearnClassifier(object):
     def classify_img(self, img):
         roi_hog_fd = self.get_hog_for_img(img)
         result = self.classifier.predict(np.array([roi_hog_fd], 'float64'))
-
-        print result
 
         return result
 
