@@ -36,14 +36,14 @@ class openCVClassifier(object):
             pass
         elif name == RANDOM_FOREST:
             self.classifier = cv2.ml.RTrees_create()
-            self.classifier.setMaxDepth(11);
-            self.classifier.setMinSampleCount(5);
-            self.classifier.setRegressionAccuracy(0);#
-            self.classifier.setUseSurrogates(False);
-            self.classifier.setMaxCategories(15);
-            self.classifier.setCalculateVarImportance(False);
-            self.classifier.setActiveVarCount(0);
-            self.classifier.setTermCriteria((cv2.TERM_CRITERIA_MAX_ITER,100,0.01));
+            self.classifier.setMaxDepth(11)
+            self.classifier.setMinSampleCount(5)
+            self.classifier.setRegressionAccuracy(0)
+            self.classifier.setUseSurrogates(False)
+            self.classifier.setMaxCategories(15)
+            self.classifier.setCalculateVarImportance(False)
+            self.classifier.setActiveVarCount(0)
+            self.classifier.setTermCriteria((cv2.TERM_CRITERIA_MAX_ITER, 100, 0.01))
         else:
             print "No correct classifier set: %s" % name
 
@@ -56,7 +56,7 @@ class openCVClassifier(object):
             image_hog = self.get_hog_for_img(image.reshape((28, 28)))
             image_hog_list.append(image_hog)
 
-        print "HOG feature vector lenght: " + str(len(image_hog_list[0]))
+        print "HOG feature vector length: " + str(len(image_hog_list[0]))
         hog_features = np.array(image_hog_list, 'float32')
 
         if self.type == LINEAR or self.type == RANDOM_FOREST:
