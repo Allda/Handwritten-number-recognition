@@ -43,11 +43,6 @@ class openCVClassifier(object):
             self.classifier = cv2.ml.RTrees_create()
             self.classifier.setMaxDepth(11)
             self.classifier.setMinSampleCount(5)
-            self.classifier.setRegressionAccuracy(0)
-            self.classifier.setUseSurrogates(False)
-            self.classifier.setMaxCategories(15)
-            self.classifier.setCalculateVarImportance(False)
-            self.classifier.setActiveVarCount(0)
             self.classifier.setTermCriteria((cv2.TERM_CRITERIA_MAX_ITER, 100, 0.01))
         else:
             print "No correct classifier set: %s" % name

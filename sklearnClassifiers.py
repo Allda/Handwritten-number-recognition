@@ -41,7 +41,7 @@ class sklearnClassifier(object):
                            algorithm="SAMME",
                            n_estimators=200)
         elif name == RANDOM_FOREST:
-            self.classifier = RandomForestClassifier(n_estimators = 100, max_depth=11)
+            self.classifier = RandomForestClassifier(n_estimators=100, max_depth=11, min_samples_split=5)
         else:
             print "No correct classifier set: %s" % name
 
