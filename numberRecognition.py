@@ -50,6 +50,7 @@ def main():
 
     if args.train_sklearn_classifier:
         classifier = sklearnClassifier()
+        classifier.init_hog()
         classifier.create_classifier(args.train_sklearn_classifier)
 
         print 'train sklearn %s' % args.train_sklearn_classifier
@@ -66,7 +67,7 @@ def main():
 
     elif args.train_opencv_classifier:
         classifier = openCVClassifier()
-        classifier.create_hog()
+        classifier.init_hog()
         classifier.create_classifier(args.train_opencv_classifier)
 
         print 'train opencv %s' % args.train_opencv_classifier

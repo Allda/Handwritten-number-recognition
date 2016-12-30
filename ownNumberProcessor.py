@@ -12,7 +12,7 @@ class OwnNumberProcessor(object):
     def set_img(self, img_name):
         self.img = cv2.imread(img_name)
 
-    def process(self, lcvs):
+    def process(self, classifier):
 
         if not len(self.img[0:0]) == 1:
             gray_img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
@@ -43,8 +43,7 @@ class OwnNumberProcessor(object):
             roi = cv2.resize(roi, (28, 28), interpolation=cv2.INTER_AREA)
             roi = cv2.dilate(roi, (3, 3))
 
-            roi_hog_fd = hog(roi, orientations=9, pixels_per_cell=(14, 14), cells_per_block=(1, 1), visualise=False)
-            nbr = lcvs.predict(np.array([roi_hog_fd], 'float64'))
+            nbr = classifier.classify_img(roi)
             cv2.putText(self.img, str(int(nbr[0])), (rect[0], rect[1]),cv2.FONT_HERSHEY_DUPLEX, 2, (0, 255, 255), 3)
 
         cv2.imshow("Rectangles", self.img)

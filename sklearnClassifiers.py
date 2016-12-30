@@ -22,18 +22,27 @@ class sklearnClassifier(object):
 
     classifier_file_name = 'classifier-sklearn.pkl'
     pixels_per_cell = (14, 14)
-    cells_per_block = (1, 1)
+    cells_per_block = (2, 2)
+    win_size = (28, 28)
+    nbins = 9
 
     def __init__(self):
-        self.hog = None
         self.classifier = None
         self.type = ""
+
+    def init_hog(self, win_size=(28, 28), block_size=(14, 14), cell_size=(14, 14), nbins=9):
+        self.win_size = win_size
+        self.pixels_per_cell = cell_size
+        self.cells_per_block = (block_size[0]/cell_size[0], block_size[1]/cell_size[1])
+        print self.pixels_per_cell
+        print self.cells_per_block
+        self.nbins = nbins
 
     def create_classifier(self, name):
         if name == LINEAR:
             self.classifier = SVC(kernel="linear", gamma=0.1, C=10)
         elif name == POLYNOMIAL:
-            self.classifier = SVC(kernel="poly", C=0.1, degree=5)
+            self.classifier = SVC(kernel="poly", C=0.1, degree=3)
         elif name == K_NEAREST:
             self.classifier = KNeighborsClassifier()
         elif name == ADABOOST:
@@ -58,9 +67,8 @@ class sklearnClassifier(object):
         image_hog_list = []
         start = time.time()
         for image in images:
-            image_hog = hog(image.reshape((28, 28)), orientations=9,
-                            pixels_per_cell=self.pixels_per_cell, cells_per_block=self.cells_per_block,
-                            visualise=False)
+            image_hog = self.get_hog_for_img(image.reshape((28, 28)))
+
             image_hog_list.append(image_hog)
 
         end = time.time()
@@ -79,9 +87,7 @@ class sklearnClassifier(object):
         result = []
         start = time.time()
         for index, image in enumerate(images):
-            image_hog = hog(image.reshape((28, 28)), orientations=9,
-                            pixels_per_cell=self.pixels_per_cell, cells_per_block=self.cells_per_block,
-                            visualise=False)
+            image_hog = self.get_hog_for_img(image.reshape((28, 28)))
 
             predicted_value = self.classifier.predict(np.array([image_hog]))[0]
             result.append((labels[index], predicted_value))
@@ -94,9 +100,10 @@ class sklearnClassifier(object):
             if item[0] == item[1]:
                 correct += 1
 
-        print "%s %s %s" % (correct, len(result),
-                            float(correct)/len(result) * 100)
-        self.print_statistics(result)
+        # print "%s %s %s" % (correct, len(result),
+        #                     float(correct)/len(result) * 100)
+        print float(correct)/len(result) * 100
+        # self.print_statistics(result)
 
     def print_statistics(self, result):
         numbers = []
@@ -122,8 +129,18 @@ class sklearnClassifier(object):
             number['success_rate'] = float(number['correct']) / number['total'] * 100
         print json.dumps(numbers, indent=4)
 
+    def classify_img(self, img):
+        roi_hog_fd = self.get_hog_for_img(img)
+        result = self.classifier.predict(np.array([roi_hog_fd], 'float64'))
+
+        print result
+
+        return result
+
     def get_hog_for_img(self, img):
-        return self.hog.compute(np.uint8(img))
+        return hog(img, orientations=self.nbins,
+                        pixels_per_cell=self.pixels_per_cell, cells_per_block=self.cells_per_block,
+                        visualise=False)
 
     def save_classifier(self):
         joblib.dump(self.classifier, self.classifier_file_name, compress=3)

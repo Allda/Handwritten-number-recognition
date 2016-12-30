@@ -19,8 +19,11 @@ class openCVClassifier(object):
         self.classifier = None
         self.type = ""
 
-    def create_hog(self, win_size = (28, 28), block_size = (14, 14), block_stride = (14, 14), cell_size = (14, 14), nbins = 9):
+    def init_hog(self, win_size=(28, 28), block_size=(14, 14), cell_size=(14, 14), nbins=9):
+        block_stride = cell_size
         self.hog = cv2.HOGDescriptor(win_size, block_size, block_stride, cell_size, nbins)
+        print cell_size
+        print (block_size[0]/cell_size[0], block_size[1]/cell_size[1])
 
     def create_classifier(self, name):
         if name == LINEAR:
@@ -33,7 +36,7 @@ class openCVClassifier(object):
             self.classifier = cv2.ml.SVM_create()
             self.classifier.setType(cv2.ml.SVM_C_SVC)
             self.classifier.setC(0.1)
-            self.classifier.setDegree(5)
+            self.classifier.setDegree(3)
             self.classifier.setKernel(cv2.ml.SVM_POLY)
         elif name == K_NEAREST:
             self.classifier = cv2.ml.KNearest_create()
@@ -100,6 +103,19 @@ class openCVClassifier(object):
 
         accuracy = correct * 100.0 / result.size
         print accuracy
+
+    def classify_img(self, img):
+        image_hog = self.get_hog_for_img(img.reshape((28, 28)))
+
+        if self.type == K_NEAREST:
+            ret, result, neighbours, dist = self.classifier.findNearest([image_hog], k=5)
+        else:
+            result = self.classifier.predict([image_hog])
+            result = result[1]
+
+        print result
+
+        return result
 
     def get_hog_for_img(self, img):
         return self.hog.compute(np.uint8(img))
