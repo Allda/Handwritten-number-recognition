@@ -7,6 +7,7 @@ from constants import LINEAR
 from constants import K_NEAREST
 from constants import ADABOOST
 from constants import K_MEANS
+from constants import RANDOM_FOREST
 
 class openCVClassifier(object):
 
@@ -33,6 +34,16 @@ class openCVClassifier(object):
             pass
         elif name == K_MEANS:
             pass
+        elif name == RANDOM_FOREST:
+            self.classifier = cv2.ml.RTrees_create()
+            self.classifier.setMaxDepth(11);
+            self.classifier.setMinSampleCount(5);
+            self.classifier.setRegressionAccuracy(0);#
+            self.classifier.setUseSurrogates(False);
+            self.classifier.setMaxCategories(15);
+            self.classifier.setCalculateVarImportance(False);
+            self.classifier.setActiveVarCount(0);
+            self.classifier.setTermCriteria((cv2.TERM_CRITERIA_MAX_ITER,100,0.01));
         else:
             print "No correct classifier set: %s" % name
 
@@ -47,7 +58,7 @@ class openCVClassifier(object):
 
         hog_features = np.array(image_hog_list, 'float32')
 
-        if self.type == LINEAR:
+        if self.type == LINEAR or self.type == RANDOM_FOREST:
             self.classifier.train(hog_features, cv2.ml.ROW_SAMPLE, np.array(training_labels, dtype=np.int32))
         else:
             self.classifier.train(hog_features, cv2.ml.ROW_SAMPLE, training_labels)
@@ -67,7 +78,7 @@ class openCVClassifier(object):
         result = []
         if self.type == K_NEAREST:
             ret, result, neighbours, dist = self.classifier.findNearest(hog_features_test, k=5)
-        elif self.type == LINEAR:
+        elif self.type == LINEAR or self.type == RANDOM_FOREST:
             result = self.classifier.predict(hog_features_test)
             result = result[1]
 
