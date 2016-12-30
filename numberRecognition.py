@@ -43,6 +43,9 @@ def setup_parser():
                             help='Specify size of block - for example 7 7')
     parser.add_argument('--cell-size', default=None, metavar='Tuple', nargs='+', type=int,
                             help='Specify size of cell - for example 7 7')
+    parser.add_argument('--bins', default=None, metavar='int',
+                            help='Specify count of the bins.')
+
     return parser
 
 
@@ -54,6 +57,7 @@ def main():
 
     block_size = (14, 14)
     cell_size = (7, 7)
+    nbins = 9
 
     if args.block_size:
         block_size = tuple(args.block_size)
@@ -61,10 +65,13 @@ def main():
     if args.cell_size:
         cell_size = tuple(args.cell_size)
 
+    if args.bins:
+        nbins = int(args.bins)
+
     if args.train_sklearn_classifier:
         classifier = sklearnClassifier()
 
-        classifier.init_hog(block_size=block_size, cell_size=cell_size)
+        classifier.init_hog(block_size=block_size, cell_size=cell_size, nbins=nbins)
         classifier.create_classifier(args.train_sklearn_classifier)
 
         print 'train sklearn %s' % args.train_sklearn_classifier
@@ -81,7 +88,7 @@ def main():
 
     elif args.train_opencv_classifier:
         classifier = openCVClassifier()
-        classifier.init_hog(block_size=block_size, cell_size=cell_size)
+        classifier.init_hog(block_size=block_size, cell_size=cell_size, nbins=nbins)
         classifier.create_classifier(args.train_opencv_classifier)
 
         print 'train opencv %s' % args.train_opencv_classifier
@@ -99,7 +106,7 @@ def main():
 
     elif args.classify_mnist_sklearn:
         classifier = sklearnClassifier()
-        classifier.init_hog(block_size=block_size, cell_size=cell_size)
+        classifier.init_hog(block_size=block_size, cell_size=cell_size, nbins=nbins)
         classifier.load_classifier()
 
         testing_imgs, testing_labels = mnist.load_testing()
@@ -120,7 +127,7 @@ def main():
     elif args.classify_own_sklearn:
         print 'classify own picture %s' % args.classify_own_opencv
         classifier = sklearnClassifier()
-        classifier.init_hog(block_size=block_size, cell_size=cell_size)
+        classifier.init_hog(block_size=block_size, cell_size=cell_size, nbins=nbins)
         classifier.load_classifier()
         processor = OwnNumberProcessor()
         processor.set_img(args.classify_own_sklearn)
