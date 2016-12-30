@@ -1,7 +1,7 @@
 Projekt: Rozpoznavani rucne psanych cislic
 Predmet: POV
 Autori: Ales Raszka, Marek Fiala, Matus Dobrotka
-Year: 2016
+Rok: 2016
 
 Projekt je napsan v jazyce Python s vyuzitim knihoven OpenCV 3.1. a Scikit-image 0.18.1.
 
@@ -36,8 +36,8 @@ Klasifikatory mozne pouzit misto KLASIFIKATOR jsou nasledujici:
 	linear - Linearni SVM
 	polynomial - Polynomialni SVM
 	k-nearest - K-nejblizsich sousedu
-	adaboost - konkretne se jedna o SAMME, funkci pouze pri kombinaci s parametrem -train-sklearn-classifier KLASIFIKATOR	 
-	random-forest - Nahodny les
+	adaboost - konkretne se jedna o SAMME, funkcni pouze pri kombinaci s parametrem -train-sklearn-classifier KLASIFIKATOR	 
+	random-forest - Random forest
 
 
 Dodatecne moznosti je mozno nastavit pomoci:
