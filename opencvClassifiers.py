@@ -1,5 +1,13 @@
+########################################################
+# Authors: Ales Raszka, Marek Fiala, Matus Dobrotka
+# Project: POV
+# Year: 2016
+########################################################
+
+
 import numpy as np
 import time
+import sys
 
 import cv2
 
@@ -11,6 +19,7 @@ from constants import POLYNOMIAL
 
 
 class openCVClassifier(object):
+    """This object provide classification methods from OpenCV"""
 
     classifier_file_name = 'classifier-opencv.pkl'
 
@@ -20,10 +29,13 @@ class openCVClassifier(object):
         self.type = ""
 
     def init_hog(self, win_size=(28, 28), block_size=(14, 14), cell_size=(14, 14), nbins=9):
+        """Initialize parameters for HOGDetector.
+        Block stride is same as cell size because of compatibility with another library """
         block_stride = cell_size
         self.hog = cv2.HOGDescriptor(win_size, block_size, block_stride, cell_size, nbins)
 
     def create_classifier(self, name):
+        """Create classifier which is specified by name"""
         if name == LINEAR:
             self.classifier = cv2.ml.SVM_create()
             self.classifier.setType(cv2.ml.SVM_C_SVC)
@@ -39,6 +51,8 @@ class openCVClassifier(object):
         elif name == K_NEAREST:
             self.classifier = cv2.ml.KNearest_create()
         elif name == ADABOOST:
+            print "AdaBoost is not implemented in OpenCV for more than one class."
+            sys.exit(1)
             pass
         elif name == RANDOM_FOREST:
             self.classifier = cv2.ml.RTrees_create()
@@ -50,7 +64,12 @@ class openCVClassifier(object):
 
         self.type = name
 
+    def load_classifier(self):
+        """In OpenCV 3.1 there is no possibility to load classifier from image yet"""
+        pass
+
     def train_classifier(self, training_imgs, training_labels):
+        """Train classifier on added data"""
         image_hog_list = []
         start = time.time()
         for image in training_imgs:
@@ -73,6 +92,7 @@ class openCVClassifier(object):
         print("time to train: " + str(end - start))
 
     def test_classifier(self, testing_imgs, testing_labels):
+        """Test classifier on added data"""
         image_hog_list_test = []
         start = time.time()
         for image in testing_imgs:
@@ -103,6 +123,7 @@ class openCVClassifier(object):
         print accuracy
 
     def classify_img(self, img):
+        """Classify number which is written in image"""
         image_hog = self.get_hog_for_img(img.reshape((28, 28)))
 
         if self.type == K_NEAREST:

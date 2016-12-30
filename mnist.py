@@ -1,9 +1,17 @@
+########################################################
+# Authors: Ales Raszka, Marek Fiala, Matus Dobrotka
+# Project: POV
+# Year: 2016
+########################################################
+
+
 import os
 import struct
 from array import array
 
 
 class MNIST(object):
+    """Object that interacts with MNIST database"""
     def __init__(self, path='.'):
         self.path = path
 

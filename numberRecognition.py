@@ -1,3 +1,9 @@
+########################################################
+# Authors: Ales Raszka, Marek Fiala, Matus Dobrotka
+# Project: POV
+# Year: 2016
+########################################################
+
 import sys
 
 import argparse
@@ -11,6 +17,7 @@ from sklearnClassifiers import sklearnClassifier
 from constants import classifiers
 
 def setup_parser():
+    """Function that create parser object that parse command line parameters"""
     parser = argparse.ArgumentParser(description='Hand writen number '
                                                  ' recognition')
     main_group = parser.add_mutually_exclusive_group()
@@ -50,6 +57,7 @@ def setup_parser():
 
 
 def main():
+    """Main function that process actions"""
     parser = setup_parser()
     args = parser.parse_args()
 
@@ -59,6 +67,7 @@ def main():
     cell_size = (7, 7)
     nbins = 9
 
+    # Parameters that specify HOG computation
     if args.block_size:
         block_size = tuple(args.block_size)
 

@@ -1,9 +1,15 @@
+########################################################
+# Authors: Ales Raszka, Marek Fiala, Matus Dobrotka
+# Project: POV
+# Year: 2016
+########################################################
+
+
 import numpy as np
 import time
 import json
 
 from skimage.feature import hog
-from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import AdaBoostClassifier
@@ -19,6 +25,7 @@ from constants import POLYNOMIAL
 
 
 class sklearnClassifier(object):
+    """This object provide classification methods from Sklearn"""
 
     classifier_file_name = 'classifier-sklearn.pkl'
     pixels_per_cell = (14, 14)
@@ -37,6 +44,7 @@ class sklearnClassifier(object):
         self.nbins = nbins
 
     def create_classifier(self, name):
+        """Create classifier which is specified by name"""
         if name == LINEAR:
             self.classifier = SVC(kernel="linear", gamma=0.1, C=10)
         elif name == POLYNOMIAL:
@@ -61,7 +69,7 @@ class sklearnClassifier(object):
             print "No classifier file has been found: %s" % self.classifier_file_name
 
     def train_classifier(self, images, labels):
-
+        """Train classifier on added data"""
         image_hog_list = []
         start = time.time()
         for image in images:
@@ -82,6 +90,7 @@ class sklearnClassifier(object):
         print("time to train: " + str(end - start))
 
     def test_classifier(self, images, labels):
+        """Test classifier on added data"""
         result = []
         start = time.time()
         for index, image in enumerate(images):
@@ -125,6 +134,7 @@ class sklearnClassifier(object):
         print json.dumps(numbers, indent=4)
 
     def classify_img(self, img):
+        """Classify number which is written in image"""
         roi_hog_fd = self.get_hog_for_img(img)
         result = self.classifier.predict(np.array([roi_hog_fd], 'float64'))
 

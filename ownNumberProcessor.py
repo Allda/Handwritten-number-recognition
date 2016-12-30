@@ -1,5 +1,9 @@
-import numpy as np
-from skimage.feature import hog
+########################################################
+# Authors: Ales Raszka, Marek Fiala, Matus Dobrotka
+# Project: POV
+# Year: 2016
+########################################################
+
 
 import cv2
 
@@ -14,6 +18,7 @@ class OwnNumberProcessor(object):
 
     def process(self, classifier):
 
+        # If the image is not grayscale it transforms it
         if not len(self.img[0:0]) == 1:
             gray_img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         else:
@@ -21,9 +26,11 @@ class OwnNumberProcessor(object):
 
         gray_img = cv2.GaussianBlur(gray_img, (5, 5), 0)
 
+        # Threshold and finding a contours
         ret, process_img = cv2.threshold(gray_img, 90, 255, cv2.THRESH_BINARY_INV)
         _, ctrs, _ = cv2.findContours(process_img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+        # For every contour it finds min rectangle and find image
         rects = [cv2.boundingRect(ctr) for ctr in ctrs]
 
         for rect in rects:
