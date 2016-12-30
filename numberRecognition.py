@@ -59,6 +59,11 @@ def main():
         classifier.train_classifier(training_imgs, training_labels)
         classifier.save_classifier()
 
+        testing_imgs, testing_labels = mnist.load_testing()
+        testing_imgs = np.array(testing_imgs)
+        testing_labels = np.array(testing_labels)
+        classifier.test_classifier(testing_imgs, testing_labels)
+
     elif args.train_opencv_classifier:
         classifier = openCVClassifier()
         classifier.create_hog()
@@ -70,15 +75,14 @@ def main():
         training_labels = np.array(training_labels)
 
         classifier.train_classifier(training_imgs, training_labels)
+        classifier.save_classifier()
 
         testing_imgs, testing_labels = mnist.load_testing()
         testing_imgs = np.array(testing_imgs)
         testing_labels = np.array(testing_labels)
         classifier.test_classifier(testing_imgs, testing_labels)
-        classifier.save_classifier()
 
     elif args.classify_mnist:
-        print 'clasify mnist'
         classifier = sklearnClassifier()
         classifier.load_classifier()
 

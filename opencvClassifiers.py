@@ -6,8 +6,9 @@ import cv2
 from constants import LINEAR
 from constants import K_NEAREST
 from constants import ADABOOST
-from constants import K_MEANS
 from constants import RANDOM_FOREST
+from constants import POLYNOMIAL
+
 
 class openCVClassifier(object):
 
@@ -18,21 +19,25 @@ class openCVClassifier(object):
         self.classifier = None
         self.type = ""
 
-    def create_hog(self, win_size = (28, 28), block_size = (14, 14), block_stride = (14, 14), cell_size = (7, 7), nbins = 9):
+    def create_hog(self, win_size = (28, 28), block_size = (14, 14), block_stride = (14, 14), cell_size = (14, 14), nbins = 9):
         self.hog = cv2.HOGDescriptor(win_size, block_size, block_stride, cell_size, nbins)
 
     def create_classifier(self, name):
         if name == LINEAR:
             self.classifier = cv2.ml.SVM_create()
             self.classifier.setType(cv2.ml.SVM_C_SVC)
-            self.classifier.setGamma(5.383)
-            self.classifier.setC(2.67)
+            self.classifier.setGamma(0.1)
+            self.classifier.setC(10)
             self.classifier.setKernel(cv2.ml.SVM_LINEAR)
+        elif name == POLYNOMIAL:
+            self.classifier = cv2.ml.SVM_create()
+            self.classifier.setType(cv2.ml.SVM_C_SVC)
+            self.classifier.setC(0.1)
+            self.classifier.setDegree(5)
+            self.classifier.setKernel(cv2.ml.SVM_POLY)
         elif name == K_NEAREST:
             self.classifier = cv2.ml.KNearest_create()
         elif name == ADABOOST:
-            pass
-        elif name == K_MEANS:
             pass
         elif name == RANDOM_FOREST:
             self.classifier = cv2.ml.RTrees_create()
@@ -56,9 +61,13 @@ class openCVClassifier(object):
             image_hog = self.get_hog_for_img(image.reshape((28, 28)))
             image_hog_list.append(image_hog)
 
+        end = time.time()
+        print("Time to calculation of HOG per image: " + str((end - start)/len(image_hog_list)))
         print "HOG feature vector length: " + str(len(image_hog_list[0]))
+
         hog_features = np.array(image_hog_list, 'float32')
 
+        start = time.time()
         if self.type == LINEAR or self.type == RANDOM_FOREST:
             self.classifier.train(hog_features, cv2.ml.ROW_SAMPLE, np.array(training_labels, dtype=np.int32))
         else:
@@ -79,7 +88,7 @@ class openCVClassifier(object):
         result = []
         if self.type == K_NEAREST:
             ret, result, neighbours, dist = self.classifier.findNearest(hog_features_test, k=5)
-        elif self.type == LINEAR or self.type == RANDOM_FOREST:
+        else:
             result = self.classifier.predict(hog_features_test)
             result = result[1]
 

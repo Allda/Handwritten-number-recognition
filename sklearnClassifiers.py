@@ -4,25 +4,25 @@ import json
 
 from skimage.feature import hog
 from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.cluster import KMeans
 from sklearn.externals import joblib
 from sklearn.ensemble import RandomForestClassifier
 
 from constants import LINEAR
 from constants import K_NEAREST
 from constants import ADABOOST
-from constants import K_MEANS
 from constants import RANDOM_FOREST
+from constants import POLYNOMIAL
 
 
 class sklearnClassifier(object):
 
     classifier_file_name = 'classifier-sklearn.pkl'
-    pixels_per_cell = (6, 6)
-    cells_per_block = (4, 4)
+    pixels_per_cell = (14, 14)
+    cells_per_block = (1, 1)
 
     def __init__(self):
         self.hog = None
@@ -31,7 +31,9 @@ class sklearnClassifier(object):
 
     def create_classifier(self, name):
         if name == LINEAR:
-            self.classifier = LinearSVC()
+            self.classifier = SVC(kernel="linear", gamma=0.1, C=10)
+        elif name == POLYNOMIAL:
+            self.classifier = SVC(kernel="poly", C=0.1, degree=5)
         elif name == K_NEAREST:
             self.classifier = KNeighborsClassifier()
         elif name == ADABOOST:
@@ -39,9 +41,7 @@ class sklearnClassifier(object):
                            algorithm="SAMME",
                            n_estimators=200)
         elif name == RANDOM_FOREST:
-            self.classifier = RandomForestClassifier(n_estimators = 100)
-        elif name == K_MEANS:
-            self.classifier = KMeans(n_clusters=10) # We have ten numbers
+            self.classifier = RandomForestClassifier(n_estimators = 100, max_depth=11)
         else:
             print "No correct classifier set: %s" % name
 
@@ -60,12 +60,16 @@ class sklearnClassifier(object):
         for image in images:
             image_hog = hog(image.reshape((28, 28)), orientations=9,
                             pixels_per_cell=self.pixels_per_cell, cells_per_block=self.cells_per_block,
-                            visualise=True)
+                            visualise=False)
             image_hog_list.append(image_hog)
+
+        end = time.time()
+        print("Time to calculation of HOG per image: " + str((end - start)/len(image_hog_list)))
+        print "HOG feature vector length: " + str(len(image_hog_list[0]))
+
         hog_features = np.array(image_hog_list, 'float64')
 
-        print "HOG feature vector lenght: " + str(len(image_hog_list[0]))
-
+        start = time.time()
         self.classifier.fit(hog_features, labels)
 
         end = time.time()

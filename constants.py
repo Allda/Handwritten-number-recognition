@@ -1,7 +1,7 @@
 LINEAR = "linear"
-K_MEANS = "k-means"
 K_NEAREST = "k-nearest"
 ADABOOST = "adaboost"
 RANDOM_FOREST = "random-forest"
+POLYNOMIAL = "polynomial"
 
-classifiers = [LINEAR, K_MEANS, K_NEAREST, ADABOOST, RANDOM_FOREST]
+classifiers = [LINEAR, K_NEAREST, ADABOOST, RANDOM_FOREST, POLYNOMIAL]
